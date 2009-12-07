@@ -1,0 +1,7 @@
+# .gitignore for teamreport
+
+*.pdf
+*.aux
+*.log
+*.out
+*.toc
