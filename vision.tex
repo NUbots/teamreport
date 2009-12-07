@@ -1,0 +1,15 @@
+\section{Vision}
+The Nao vision system followed the process: \emph{Input image, classify image, form blobs, sort colour blobs, combine soft blobs, find ball, find goals, line detection}. Even though the vision process was based on NUbot code the only section that could be reused was blob formation. 
+
+The 2008 vision module was very simple. This section details the main functions of the vision system and the reasons behind them. 
+\subsection{Overview}
+
+Webots was used to delevop the base vision system. Inputting the rgb image and classifying it using a perfect look-up table (LUT) allowed blob formation and basic object recognition to be tested which then allowed for localisation development to begin.
+
+We then worked on developing the vision debug application \emph{Eye of the NUManoid} (EOTN). What made this application different is the HSI classifcation method. Transforming the YUV image to HSI values and selecting the classification region in HSI allowed for an intuitive classification method and better separation of hue ranges. 
+
+Once we had a robot we were able to select camera settings using \emph{Telepathe} and save image streams. We could then work on object recognition. It was very basic, however localisation was quite basic aswell. 
+
+\input{classandblobs.tex}
+\input{objects.tex}
+\input{lines.tex}

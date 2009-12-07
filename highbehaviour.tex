@@ -1,0 +1,202 @@
+\newcommand{\Position}{\textnormal{$\mathcal{P}$}\unskip}
+\newcommand{\Formation}{\textnormal{$\mathcal{F}$}\unskip}
+\newcommand{\FormationDef}{\textnormal{$\mathcal{D}$}\unskip}
+\newcommand{\FormationOff}{\textnormal{$\mathcal{O}$}\unskip}
+\newcommand{\Highlevel}{\textnormal{$\mathcal{S}$}\unskip}
+\newcommand{\distance}{\textnormal{$\textsl{bvrMessage}$}\unskip}
+%
+\newcommand{\RED}{\textcolor{red}{Red}\unskip}
+\newcommand{\BLUE}{\textcolor{blue}{Blue}\unskip}
+
+\section{Team Behaviour}
+\label{teamBehaviour}
+
+Every year the importance of team behaviour is growing, this is
+partly due to increased parity in the low level skills. In 2006 we actually made a substantial change to our team behaviour system, although from the outside looking in it might have been difficult to observe this change. $\Robocup$ 2006 saw the introduction of a dynamic team behaviour system \cite{QuinlanChalup2006}, in theory allowing our robots to adapt during a game. However, the rules were constructed in a conservative manor (only making changes when losing) and as a consequence we saw no evidence of strategy changing during $\Robocup$.
+
+It is also important to remember that the $\NUbots$ prefer to play a style of game that relies on dominating both ball possession and field position. For that reason the behaviours do not rely on outright speed or power, rather they rely everything combining well and producing a relatively complete style of play.
+
+\subsection{Positions}
+\label{subsec:positions}
+
+The $\NUbot$ system defines eight basic positions that the
+robots can play. These being, \emph{Goal Keeper (GK), Sweeper (SW),
+Left Back (LB), Centre Back (CB), Right Back (RB), Left Forward
+(LF), Centre Forward (CF)} and \emph{Right Forward (RF)}.
+
+The rules define that only one robot can be a goal keeper (this
+robot must be identified at the beginning of the game), while the
+other three robots (to be referred to as \emph{field players}) are
+free to roam the field. Unlike other implementations \cite{CMU2004}
+the $\NUbots$ positions \textbf{do not} define roles, for example the robot
+chasing the ball can still be a sweeper. It is important to keep a
+distinction between positions and roles as they are not the same in
+our system. Each position $\Position$ is assigned a set of
+coordinates on the field $(x,y$) in cm and a heading $\theta$ in degrees. These define the general area on the
+field in which the robot should be positioned:
+
+\begin{equation*}
+%\Position = \left\langle x, y, \theta \right\rangle \in \mathbb{R}
+\Position = \left\langle x, y, \theta \right\rangle \in [-300,300]\times[-200,200]\times[-\pi,\pi]
+\end{equation*}
+
+For example the positions of Goal Keeper and Left Forward are
+defined as:
+\begin{equation*}
+\Position_{GK} = \left\langle -265.0, 0.0, 0.0 \right\rangle, \;\;
+\Position_{LF} = \left\langle 150.0, 80.0, 0.0 \right\rangle
+\end{equation*}
+
+\subsubsection{Formations and High-level strategies}
+\label{subsec:formations}
+
+A formation $\Formation$ is a vector that contains four positions.
+When playing a game each robot in the team is instructed to play one
+of these four positions. A high-level strategy $\Highlevel$
+contains two formations, in general these are a defensive
+$\FormationDef$ and an offensive $\FormationOff$ formation:
+\begin{eqnarray*}
+\Formation &=& \left\langle \Position_{a}, \Position_{b}, \Position_{c}, \Position_{d} \right\rangle , \\
+\Highlevel &=& \left\langle \Formation_{off}, \Formation_{def} \right\rangle
+                     \equiv \left\langle \FormationDef, \FormationOff \right\rangle
+\end{eqnarray*}
+
+The current $\NUbot$ system contains six standard formations that
+combine to form six high-level strategies:
+\begin{eqnarray*}
+\Highlevel_{normal} &=& \left\langle \FormationDef_{normal}, \FormationOff_{normal} \right\rangle \\
+\Highlevel_{sweeper} &=& \left\langle \FormationDef_{sweeper}, \FormationOff_{sweeper} \right\rangle \\
+\Highlevel_{aggressive} &=& \left\langle \FormationDef_{aggressive}, \FormationOff_{aggressive} \right\rangle \\
+\Highlevel_{offensive} &=& \left\langle \FormationDef_{sweeper}, \FormationOff_{aggressive} \right\rangle \\
+\Highlevel_{defensive} &=& \left\langle \FormationDef_{aggressive}, \FormationOff_{normal} \right\rangle \\
+\Highlevel_{hold} &=& \left\langle \FormationDef_{aggressive},\FormationDef_{aggressive} \right\rangle
+\end{eqnarray*}
+
+where
+\begin{eqnarray*}
+\begin{matrix}
+\FormationDef_{normal} &=& \left\langle \Position_{GK}, \Position_{LB}, \Position_{RB}, \Position_{CF} \right\rangle,
+\FormationOff_{normal} &=& \left\langle \Position_{GK}, \Position_{CB}, \Position_{LF}, \Position_{RF} \right\rangle    \end{matrix} \\
+\begin{matrix}
+\FormationDef_{sweeper} &=& \left\langle \Position_{GK}, \Position_{SW}, \Position_{CB}, \Position_{CF} \right\rangle,
+\FormationOff_{sweeper} &=& \left\langle \Position_{GK}, \Position_{SW}, \Position_{LF}, \Position_{RF} \right\rangle   \end{matrix} \\
+\begin{matrix}
+\FormationDef_{aggressive} &=& \left\langle \Position_{GK}, \Position_{CB}, \Position_{LB}, \Position_{RB} \right\rangle, 
+\FormationOff_{aggressive} &=& \left\langle \Position_{GK}, \Position_{CF}, \Position_{LF}, \Position_{RF} \right\rangle  \end{matrix} \\
+\end{eqnarray*}
+
+Using the described framework a new position, formation or strategy can be added in a few lines of code. It is also possible for a $\Highlevel$ to contain more then two formations, for example $\Highlevel \cong \left\langle \Formation_{off},\Formation_{midfield},\Formation_{def} \right\rangle$.
+
+\subsection{Roles and Role Allocation}
+\label{subsec:roleallocation}
+
+In the $\NUbot$ system there are two distinct roles, \texttt{chasing}
+and \texttt{positioning}. If a robot is not \texttt{chasing} then it
+must be \texttt{positioning}. The ideal situation has exactly one
+robot per team in the \texttt{chasing} role.
+\begin{equation*}
+ \texttt{chasing} \cap \texttt{positioning} =  \emptyset, \; \left|\texttt{chasing}\right| = 1
+\end{equation*}
+
+Role allocation is done without negotiation, that is, each robot
+makes a decision on the information it currently has and hopes that
+this is the same decision the other robots have made.  A single variable, $\distance$, is used to make the role decision, this variable contains a float that represents a modified distance from the robot to the ball \cite{NUBOT2005}. The \texttt{chasing} robot is defined as the robot with the lowest $\distance$. The variable also encodes additional information such as attempting a grab, dribbling and kicking. This extra information allows the \texttt{positioning} robots to perform different actions depending on what the \texttt{chasing} robot is actually doing. For
+example, the robots should position differently when the \texttt{chasing} robot has gained control of the ball and is
+dribbling. 
+
+It is possible that none or multiple robots might momentarily
+believe they are \texttt{chasing}, but in practice the noise and the
+dynamic nature of the environment means the problem rarely occurs
+and it is fixed extremely quickly (fractions of a second). An
+additional problem occurs when a robot loses sight of the ball at
+close range. In this case it is likely that a second robot will
+rapidly enter the fray, this may cause collisions until the
+non-chasing robot is able to move back to its assigned position.
+This issue is something of a trade-off, in that a less aggressive
+strategy (i.e. introducing a delay of $\mathcal{S}$ seconds) would prevent the congestion but it could lead to extended periods of time where no robot is moving towards
+the ball. A general version of the rule would be: \\\\
+$\textbf{if}\;delay>\mathcal{S}\;\textbf{then}\;\texttt{chasing}=MIN({\distance})$\\
+
+Historically the $\NUbot$s have preferred to have a \texttt{chasing} robot
+at all times, $\mathcal{S}<\frac{1}{10}$ second.
+
+\subsection{High-Level Strategy Switching}
+\label{subsec:strategies}
+
+Currently the rules for automatic strategy switching are fairly
+simple. This is primarily due to the lack of information available
+to the robot. In 2006 the robots relied solely on the current score and the time
+remaining in the match; the assumption being that the score is indicative of the effect of a strategy.
+
+Prior to the match the coaches (humans) select a strategy
+($\Highlevel_{current}$). A hierarchy of rules is then used to change
+this strategy, for example a rule taken directly from our 2006
+$\Robocup$ code (in the Python language) was
+
+\begin{verbatim}
+if (secondHalf and (oppScore > ownScore)):
+  scoreDiff = oppScore - ownScore
+  if (timeLeft/60.0 < scoreDiff):
+    newStrategy = AGGRESSIVE
+\end{verbatim}
+
+For the purpose of this report we will not discuss the entire rule
+set, rather emphasise that rules should remain flexible. Our system
+was designed to make it easy to modify or create new rules for
+different situations and opponents. It was not designed to
+completely remove the human element from the strategy decision. It
+differs from the work of McMillen et al \cite{McMillen06switch} in
+which the strategies are cycled until a good strategy is found.
+While this should result in the discovery of a good strategy there
+exists the possibility of conceding a goal (or two) while rotating
+through inferior strategies.
+
+\subsection{Position Switching}
+\label{subsec:positionswitching}
+
+In real football each player is physically different and has
+different skills and for these reasons they are suited to play
+particular positions. For all practical purposes each $\aibo$ is
+identical, and hence the position switching algorithm does not need
+to consider the attributes of each individual robot. This allows us
+to base our position switching purely on the physical locations of
+the robots and the position of the ball on the field.
+
+Again no form of negotiation is used, instead the robots rely on the
+shared world model being consistent between each other. The system essentially
+relies on the fact that each robot is capable of replicating the
+decision of the other robots, and thus the team should function as one.
+
+The first step of the position switching algorithm is to select the
+relevant formation from the current strategy. Currently this is done
+by determining a position on the field in which the team should be
+offensive or defensive. For $\Robocup$ 2006 the following
+rule was used:
+\begin{gather*} \raisetag{-10pt}
+\Formation_{current} = \begin{cases}
+                \FormationDef_{current} & \text{ball in defensive half} \\
+                \FormationOff_{current} & \text{ball in offensive half}
+            \end{cases}
+\end{gather*}
+In this version of the rule only the location of the ball determines offensive or defensive. This could be replaced by a more complicated rule involving possession. For example, if the ball is the defensive half but in the possession of a robot from your team then you should begin a transition to offence. 
+
+The goal keeper can not be switched so the algorithm need only consider the
+positions for the three field players. This is done by using the following
+rules:
+\begin{itemize}
+    \item The \texttt{chasing} robot is assigned the position closest to the ball. Note: The goal keeper will never switch positions.
+    \item The \texttt{positioning} robots are then free to play any of the remaining positions. This decision is made by minimising the total distance that these robots would need to travel.
+\end{itemize}
+
+\subsection{Goal Keeper}
+\label{bvr:gk}
+For 2006 we introduced an entirely new goal keeper. We are the first to admit that our keeper was `rusty' during the early stages of $\Robocup$ but the keeper performed extremely well in the final. Our goal keeper gives the impression of being over-exitable and over-aggressive, while this is true (in comparison to other teams) we don't believe it is a problem. Rather we like the fact that our keeper will contest balls and tackle opponents.
+
+When building the keeper we had a few key points:
+\begin{description}
+    \item[Positioning] - The robot should be positioned in manner to reduce the likelihood of a goal being shot past the keeper.
+    \item[Diving] - The robot should dive and stop any shot on goal, however if the ball is coming at its chest, it should catch the ball.
+    \item[Clearing the ball] - When given the chance to robot will attempt to clear the ball from the box.
+\end{description}
+
+In truth we have no real secrets on how we achieved these points, rather we emphasise that a lot of the work done in localisation this year was due to problems found while developing the keeper. In particular the quality of the information obtained from the goals is bad when very close (i.e our own goal), and the distance from the far beacons is often noisy. Unfortunately these are the problems most often faced by the goal keeper and therefore the were the ones we chose to work on.

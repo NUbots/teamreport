@@ -1,0 +1,49 @@
+%\documentclass{article}
+%\begin{document}
+
+
+
+\section{Locomotion}
+Given the limited preparation time, and lack of prior experience with bipedal walking, the Aldebaran locomotion engine (alMotion) was used for all movement in 2008. This included the built-in \emph{open-loop} walk engine, where only the functions \texttt{walkStraight} (always forward), \texttt{walkArc} and \texttt{turn} were called by behaviour. 
+
+There are two functions provided by alMotion that parameterise the robot's gait; \texttt{setWalkConfig} and \texttt{setWalkExtraConfig}. These parameters provide a small scope with which to change the geometry and frequency of the gait. Through manipulation of these parameters small improvements in speed or stability can be obtained.
+
+The NAO uses very high gain position control to track trajectories produced by the walk engine. The trajectories produced by the simplified walk engine are imperfect. Instead of rigidly following these trajectories the joint stiffness was reduced, and hence the control gain was reduced, to allow the robot to 'settle' into a more natural improved gait. This provided a greater extent with which the gait could be modified, and resulted in a walk that was both faster, and more stable, than the default parameters. 
+
+\subsection{Optimisation of Walk Parameters}
+
+As an initial step, using an early version of the Alderbaran walk as a base, a slow walk was developed through the manual adjustment of walk parameters and global stiffness, that is, specifying a lowered stiffness value that is applied to every motor. The low-stiffness walk used in 2008 was then created through iterative improvements resulting from both varying the walk parameters, and setting the stiffness \emph{individually} for each motor in the legs and arms. The effect of changing the walk parameters and stiffness values were not independent, for example, the ZMP offset walk parameters and ankle roll stiffness were strongly related. 
+
+Precedence was given to maintaining a low stiffness value in a joint. For example, consider the ankle pitch joint which had the lowest stiffness value in the legs (0.25). This low value meant that the robot would fall if it leant too far forward, consequently walk parameters were selected to maintain an upright stance while walking. Similar compromises were made for other joints in the legs. This process resulted in a considerable range of stiffness values, from 0.1 in the shoulders to 0.7 in the hip pitch joint.
+
+\subsection{Results}
+The speed of the low-stiffness walk was measured to be 13.9$\pm$0.2 cm/s. This was 60\% faster than the default Aldebaran walk settings \cite{youtubewalkvideo1}.
+
+The low-stiffness walk represents a 59\% improvement in efficiency compared to the default Aldebaran walk \cite{JasonsAcraPaper}. This reduction in power consumption brings the battery current draw below the manufacturer's recommendation for both nominal and peak current, both of which are exceeded by the default walk settings. Similar results were seen in the individual motors; lowering the stiffness brings the motor current below their recommend nominal currents, whereas the default settings do not.
+
+
+%\end{document}
+%
+%
+%References 
+%@misc{youtubewalkvideo1,
+%	Author = {Jason Kulk},
+%	Date-Added = {2008-08-12 23:34:32 +1000},
+%	Date-Modified = {2008-08-13 00:19:56 +1000},
+%	Howpublished = {Available at \href{http://www.youtube.com/watch?v=x9mCOxKE4I0}{http://www.youtube.com/watch?v=x9mCOxKE4I0}},
+%	Month = {August},
+%	Title = {Nao Walk Comparison [Video]},
+%	Url = {http://www.youtube.com/watch?v=x9mCOxKE4I0},
+%	Urldate = {12/8/2008},
+%	Year = {2008},
+%	Bdsk-Url-1 = {http://www.youtube.com/watch?v=x9mCOxKE4I0}}
+%
+%
+%@inproceedings{JasonsAcraPaper,
+%	Author = {Jason Kulk and James Welsh},
+%	Booktitle = {Proceedings of ACRA (to appear)},
+%	Date-Added = {2008-10-31 11:22:49 +1100},
+%	Date-Modified = {2008-10-31 11:24:22 +1100},
+%	Title = {A Low Power Walk for the NAO Robot},
+%	Year = {2008}}
+%

@@ -1,0 +1,77 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{named}
+\usepackage[pdftex]{graphicx}
+\usepackage{graphics}
+\usepackage{subfig}
+\usepackage{newlfont}
+\usepackage{amssymb}
+\usepackage{amsmath,amsthm}
+\usepackage{alltt}
+\usepackage{hyperref}
+
+
+\pagestyle{headings}
+
+%\documentstyle[subsections]
+
+\def\nonumchapter#1{%
+    \chapter*{#1}
+    \addcontentsline{toc}{chapter}{#1}}
+
+\def\baselinestretch{1.3}\large\normalsize
+\setlength{\textwidth}{14cm}
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+\newcommand{\Robocup}{\textnormal{RoboCup}\unskip}
+\newcommand{\RoboCup}{\textnormal{RoboCup}\unskip}
+\newcommand{\NUbot}{\textnormal{NUbot}\unskip}
+\newcommand{\Nubot}{\textnormal{NUbot}\unskip}
+\newcommand{\NUbots}{\textnormal{NUbots}\unskip}
+\newcommand{\Nubots}{\textnormal{NUbots}\unskip}
+\newcommand{\aibo}{\textnormal{AIBO}\unskip}
+\newcommand{\AIBO}{\textnormal{AIBO}\unskip}
+\newcommand{\fourlegged}{\textnormal{Four-Legged League}\unskip}
+
+
+\title{The 2009 Nubots Team Report}
+\author{ Naomi Henderson \and Steven P. Nicklin \and Aaron Wong \and Jason Kulk \and Stephan K. Chalup \and Robert King}
+
+\begin{document}
+
+\maketitle
+
+\begin{figure}[!h]
+\begin{center}
+   \leavevmode
+    \scalebox{0.2} {\includegraphics{figs/NUMANOIDS.jpg} }
+    \label{fig:NUMANOIDS}
+\end{center}
+\end{figure}
+
+
+\begin{center}
+School of Electrical Engineering \& Computer Science\\
+The University of Newcastle, Callaghan 2308, Australia \\
+http://www.robots.newcastle.edu.au\\
+\& \\
+National University of Ireland, Maynooth\\
+Maynooth, Co Kildare, Ireland \\
+
+\end{center}
+\newpage
+
+\tableofcontents
+\newpage
+
+\input{intro.tex}
+\input{vision.tex}
+\input{localisation.tex}
+\input{behaviour.tex}
+\input{locomotion.tex}
+\input{communication.tex}
+\input{discussion.tex}
+
+\bibliographystyle{named}
+\bibliography{aibo}
+\end{document}

@@ -1,0 +1,294 @@
+\section{Individual Behaviours}
+\label{indBehaviour}
+
+As stated in last year's report, we believe that the individual skills of the robots are arguably
+the most critical element of the game play. The importance of
+developing and fine tuning these skills should not be
+underestimated.
+
+The the key changes in 2006 revolved around better information, in particular a more accurate estimation in ball position and velocity. The outcome being a more polished and accurate set of skills, which led to less miss-grabs and higher percentage of shots on target.
+
+The three subsections are `Chasing',`Grabbing' and `Dribbling'
+
+\subsection{Chasing}
+
+The NUbots have always favoured a possession style of football. As a result
+a lot of attention is placed into to developing code for chasing
+and grabbing the ball.
+
+It turns out that good quality chasing and grabbing relies on a
+high performance of all other modules. Accurate ball distances are
+required from vision, correct ball velocities from localisation
+and precise movement and odometry calibration from locomotion.
+
+Our chase for 2006 was essentially an updated version of the 2005 chase. The main task undertaken during the year was `balancing' the reliance of velocity.
+
+The basic chase code forces the robot to take the largest possible
+step which will position the ball on the chest. In 2006 we have added some parameters that define the usage of velocity, these can be modified in real-time. The parameter CHASEVELDIV defines how many frames ahead we predict, a value of 30 = 1 vision frame while a value of 1 = 30 vision frames (i.e. 1 second ahead).
+
+Firstly, calculate the relative location of the ball -
+\begin{alltt}
+  vX = ball.vX
+  vY = ball.vY
+  if (not Strategy.CHASEVELOCITY):
+    vX = 0
+    vY = 0
+  relX = fabs(distance) * sin(bearing)
+  relY = fabs(distance) * cos(bearing)
+  tempX = relX + (vX/CHASEVELDIV) 
+  tempY = relY + (vY/CHASEVELDIV)
+\end{alltt}
+
+We then translate the position into step parameters - 
+\begin{alltt}
+  strideLength = tempY*10.0
+  strafe = CROP(tempX*10.0,-50,50)  # Don't strafe more than 5cm
+  rearStrideLength = CROP(strideLength,-1*MaxChaseLength, MaxChaseLength)
+  frontStrideLength = rearStrideLength*ChaseFMult
+  maximumTurn = 0
+  sqr = sqrt(pow(rearStrideLength,2)/MaxChaseLength + pow(strafe,2)/50.0);
+  if (sqr < 50): maximumTurn = 50 - sqr
+  absMaximumTurn = fabs(maximumTurn)
+  turn = RAD_T_DEG*(ballHeading)
+  turn = CROP(turn, -absMaximumTurn,absMaximumTurn)   
+\end{alltt}
+
+The ability to go backwards or take small strafe steps was based
+around a simple idea - ``If the ball is reasonably close and not
+in-line with the chest, then quickly adjust until the robot can
+continue its normal chase". Obviously the actual numbers need to be
+tuning based on the performance of the vision,localisation and
+locomotion modules. It is important to note that the existence of these steps is all but
+hidden from a human spectator. The steps are subtle in nature and
+often less then one full step is required to realign the chase.
+
+\subsubsection{`Paw-Dribble'}
+
+The intention of the this code was to avoid disallowed goals for dribbling the ball over the goal line. We did not have this turned on during the practice games but we after having a few goals disallowed we gradually increased its usage.
+
+The logic for deciding when to ram was essentially ``Am I near the goal line, am I roughly facing the goal and have I seen the goal in the last 5 frame)'', in code it became -
+\begin{alltt}
+if (ball.x > 200 and fabs(ball.y) < 38 and \\ RAD_T_DEG*(goal.orientation) < 10 and (Common.frame-lastGoal.seen) < 5):
+    Ramming = True
+\end{alltt}   
+ 
+The robot would then select the best paw to use and position its body in such a way to hit the ball with the paw.
+
+\subsection{Grabbing}
+\label{bvr:grab}
+Grabbing can be considered as a form of the \textit{chicken and
+egg dilemma}, in the respect that to play a `grab and move' style
+requires good grabbing, but good grabbing is only important in a
+`grab and move' style.
+
+Ever since 2002 we have employed a `grab and move' style, so for our
+team the grab is extremely critical. Efficient grabbing relies on
+everything working well, small errors in any module will severely
+effect performance. Any changes made in other modules affect the
+grab.
+
+This year we greatly increased the reliance of ball velocity, and again we solely used the shared ball for grabbing. Apart from the increased reliability of ball velocity the biggest improvements were: moving while grabbing and smoothly widening the legs when required.
+
+For $\Robocup$ an immense amount of time and effort is placed into
+developing and maintaining the grab code.
+
+\subsubsection{Grab Trigger}
+
+The point where a robot needs to trigger a grab is on a never ending
+cycle of adjustment and tuning. In 2006 we continued the use of sanity factors. In
+this method multiple grab triggers can exist with a weighting
+applied to each one. Our final version relies upon the relative
+location of the ball, the velocity of the ball and for the first time the standard deviation in the ball location.
+
+We now add a number to the relative ball location if we are uncertain of the location of the ball. The idea was to prevent false grabbing which was occurring because of bad ball measurements, it was found that the robot was often aware of a possible problem (i.e. high uncertainty).
+
+\begin{alltt}
+  newRelY = relY + (velY/10.0)
+  newRelX = relX + (velX/10.0)
+  
+  xExtra = sdBallVarX/10.0
+  yExtra = 0
+  if (sdBallVarY > 40):
+    yExtra = 3
+    newRelY = relY
+  elif (sdBallVarY > 30):
+    yExtra = 2
+    newRelY = relY
+  elif (sdBallVarY > 20):
+    yExtra = 1
+    
+  if (fabs(relX) < 4 and fabs(newRelX+xExtra) < 3.0 \\ and (newRelY+yExtra) < 15.0): 
+  	grab = True
+  if (velY < -15 and fabs(newRelX) < 4 and newRelY < fabs(velY)): 
+  	catch = True
+    grab = True
+\end{alltt}
+
+When grab is true the robot will perform the grabbing motion. If catch is also true the robot will perform the catching motion.
+
+\subsubsection{Grab Motion}
+
+This year's grab motion relied heavily on localisation, we would
+walk in the direction of the shared ball while doing the grab. The
+benefit being that grab motion itself would try and cover up an
+error in the grab trigger, it also allowed us to handle balls that
+were rolling away or towards the robot.
+
+The 2005 and 2006 our grab remained was quite fast, the entire motion could be
+completed in 10 vision frames ($\leq$ 1/3 of a second). However, in 2006 we allowed this number to increase when requried, for example if we were `moving backwards in chase' then the motion required extra time ($\approx$20 frames).
+
+During the grab the head would first be lifted, allowing the ball to
+slide under and then the head would be dropped over the ball in
+conjunction with the mouth being opened. While the head is moving
+the front legs are moved slightly forwards and outwards to surround
+the ball. The basics of this code have remained unchanged from last year, see  \cite{NUBOT2005} for the actual python code.
+
+\subsubsection{Catch Motion}
+\label{bvr:catch}
+The catching motion is actually a modification of the grab motion. It also allows the robot to move towards the expected location of the ball but it dramatically changes the location of the legs. Both front legs are now moved 2cm forwards and outwards. Also note that the execution time (represented by $mult$) has been increased to 12-13 frames.
+
+\begin{alltt}
+  if (catch or (velY < -15 and newRelY < fabs(velY))): 
+    extraWidthLeft = 20
+    extraLengthLeft = 20
+    extraWidthRight = 20
+    extraLengthRight = 20
+    mult = 1.25
+    minWalk = 20
+    newRelY = relY+(velY/10.0)
+    newRelX = relX+(velX/10.0)
+\end{alltt}
+ 
+
+\subsection{Dribbling}
+
+On of the key features of our play was the omni-direction
+dribble employed. This dribble was primarily used to line up the
+goal or to avoid other robots. It should be noted that many of the
+`nice' features of our dribbling (i.e. dodging robots, kicking
+through gaps etc) are not the result of overly advanced vision but
+rather a combination of simple but deliberate rules (albeit these
+rules required a lot of effort to create and tune). In testing we have seen over 20 state (rule) changes in 40 dribble frames, this is how our attackers appear to perform highly complex sequences of motions.
+
+The stance used for the chase had to satisfy multiple conditions -
+\begin{description}
+    \item[Omni-directional] - For optimal use the stance should
+    give full omni-directional movement, this allows the robot
+    to strafe around robots, dribble between opponents or back the
+    ball off sidelines.
+    \item[Control the ball] - Obviously the robot should never drop the
+    ball but finding the right combination between omni-directionality
+    and holding was difficult. We found the optimal solution
+    was to have a `loose` hold on the ball, that is the ball could
+    bobble between the legs and the head but could never pop out.
+    \item[Vision Distance] - In our system the robot could see goals from over
+    half the field while dribbling the ball. This enabled us to line
+    up long range shots or avoid distant robots.
+\end{description}
+
+Walk optimisation was then run to improve the speed of the dribble.
+In these experiments the robot ran between two pink balls while
+dribbling the orange ball. Some parameters such as
+forntForwardOffset and frontSideOffset were constrained to make sure
+the ball was held and the final parameters allowed the robot to
+dribble at approximately 35cm/s
+
+An internal timer was used to monitor the dribbling time, it forced
+the robot to cancel before it got close to the 3 second limit.
+
+The dribble logic can be summarised as \emph{Check for ball},
+\emph{dribble away from sidelines},\emph{dodge an opponent} and then  \emph{line up the goal}.
+
+In 2006 the key upgrades in the dribbling code was actually two vision `fixes' that we thought we had working in 2005. These were `goal gap detection' and `narrow goals'. These fixes instantly allowed our current dribbling code to target goals much more efficiently (reducing the number of off-target shots).
+
+\subsubsection{Lining up to shoot at goal}
+
+If the goal is visible then turning towards it is relatively
+straight forward, if the goal is not visible then one must rely on
+localisation. The important part is that you can construct a more
+reliable rule for facing the opponent goal then simply turning
+towards the opponent goal. At first glance this statement may not
+make much sense, but it is often better to turn away from your own
+goal. In most situations turning away from your own goal is
+equivalent to turning towards the opponent goal, but cases do exist
+where they are not one and the same. Our logic for choosing the turn
+direction is shown below -
+\begin{alltt}
+  angleToTurn = -ownGoalAngle
+  # Own goal and oppoent goal are in the same direction
+  if (fabs(ownGoalAngle) > 0 and fabs(opponentGoalAngle) > 0):
+    if (me.x > -100): # If attacking .. turn towards opponent goal
+      angle = opponentGoalAngle
+    else: # If defending .. turn away from own goal
+      angle = -ownGoalAngle
+\end{alltt}
+
+Our robots will then turn until they see the goal or expect to see
+the goal based on localisation. If the goal is seen then they line
+up to the goal gap not the actual goal.
+
+Once lined up we have two main options, the robot can kick the ball
+or the robot can dribble the ball to a better position to kick.
+
+When attacking we tend to dribble the ball a bit longer in an
+attempt to further line up the goal. If the robot is in one of the attacking corners, then it will dribble towards the goal but also veers towards the centre of the field. The veer opens up the face of the goal, therefore creating a better target to shoot at.
+
+\subsubsection{Obstacle Avoidance - ``Infrared"}
+
+At $\Robocup$ 2006 we actually removed the vision based avoidance used in 2005 as it was noticed that the majority of avoidance was actually done using the infrared sensors. The infrared also has the added benefit of avoiding any obstacle,
+i.e. the goal post or a referees leg. 
+
+The first important step is tuning the infrared sensor value to a
+value that indicates an obstruction, the stance of the robot effects
+this number, ideally you want to maximise this value so that it does
+not cause the robot to avoid the ground (i.e. at what distance does
+the infrared cross the ground). We made the robot dribble with the
+ball and monitored the values of the IR sensors to discover this
+number. It turns out the sensors vary considerably between robots,
+so we had to customise this for each robot.
+
+Deciding on the direction to avoid is hard since the IR sensors only
+give you a distance. In 2006 we made the decision to always move
+towards the goal, this has the advantage of the robot never running
+outside the field and you should increase your likelihood of scoring. 
+
+The IR sensor avoidance produced the unexpected
+positive side effect of the robot avoiding the goal post. This allowed our attackers to
+dodge goal posts and end up inside the goal.
+
+\subsubsection{Avoiding sidelines}
+
+The key advantage of the omni-directional dribble was the ability for
+our robots to back the ball off any field lines. We achieved this using our potential field system, the repulsiveness
+of the lines is turned up hence driving our robots away from the
+edges of the field. Using the potential field allows the robot to
+move smoothly, i.e in the corners of the field the robot will move
+diagonally out of the corner.
+
+We did have to sacrifice some vision distance when moving backwards as the head needed to be placed further down to hold the ball.
+
+\subsection{Kick Selection}
+
+The effectiveness of our dribbling code simplified our kick
+selection logic. At $\Robocup$ we actually used 5 types of kicks, 3 of
+which went forwards at varying lengths, one that went backwards and one that went at 90 degrees.
+
+Typically we tried to keep the ball in play at all times, hence we
+only used our most powerful kick in two cases: in the back of the
+defensive half and clearing to the front half or if the robot is
+lined up to the goal (thus it is a shot on goal). 
+
+We used our second most powerful forwards kick (sideswipe with the head that
+went forwards, which was actually a walk) when we were roughly
+facing forwards but not going to score a goal. This kick was used to 
+progress the ball forwards and remain semi-in-control of the ball.
+
+The third forwards kick was more of a `drop', it was used when we simply
+wanted to release the ball a small distance in front of us.
+
+We used `slap' kicks to quickly clear balls from the back of the field. The kicks do not need a grab and can move the ball most of the field at a 90 degree angle. We had the option to turn these kicks on in the offensive half but this was not used at $\Robocup$.
+
+We also have countless other kicks ($\approx$30), but they all have
+advantages and disadvantages. The fact that they often do not work
+on every robot led us to use only a small percentage of them.
+

@@ -1,0 +1,46 @@
+%\emph{Input image, classify image, form blobs, sort colour blobs, combine soft blobs, find ball, find goals, line detection}
+
+
+\subsection{Image Quality and Camera Settings}
+One good thing about the transition from the Aibo to the Nao was the improvement in camera quality. While the camera still had its share of problems, such as random swaps of U and V channels, random blackouts and random ghost camera settings, at least it made the separation of colours easier.
+
+\subsubsection{Camera settings}
+
+The Aibo camera has three camera settings and three values for each setting. The Nao camera has 6 main camerea settings with a large range of values for each setting. This means that the camera settings are very sensitive to lighting changes and not only do colour tables need to be recalibrated for any change, but also the camera settings. At the RoboCup venue the camera settings and colour tables had to be recalibrated for both the main field and test field. 
+
+The robot is mobile with a movable head. This means that images are subject to blurring and lighting flare. Camera settings are chosen to minimise bluring and allow for best colour separation.
+
+\subsection{Colour Classification}
+
+Colour classification is the top tier in the software system. Any error in classification has a flow on effect to the entire system. Image pixels are mapped to a colour class by referencing a LUT. The environment of the Standard Platform League is colour coded so that objects are recognisable by colour. Rather than classify pixels based on object colour classes alone, additional 'soft' colour classes are used to allow additional colour information to be classified and to reduce the risk of false positive classification.
+
+\subsubsection{Soft Colour Classification}
+
+Soft colour classification is used to classify regions of colour that belong to an object but is less saturated due to lighting conditions or overlaps with another colour class. This allows the decision about what object the soft colour belongs to, to be delayed until the entire image is procesed.
+
+Using soft colour allows for the classification of `noisy' shades of colour and allows valueable object size information to be kept. The risk of false positives is reduced by allowing true colour to be classed as the shades of colour that are highly saturated. Object decisions are based on the presence of true colour and then soft colour can be used for additional size information.
+
+There are significant differences in the application of soft colour between the Aibo and Nao camera. The Aibo camera was low to the ground. This meant that objects were subject to heavy shadowing when upclose to an object. It also meant that when the ball was close to the robot it could fill the entire image. The camera quality was significantly worse than the Nao robot and there was significant overlap between objects of close hues. Soft colour was applied to separate the red uniform and orange ball, the orange ball and yellow goal, the blue goal from the navy blue uniform and the blue goal from the green field. 
+
+While the heightened stance and improved camera quality of the Nao has improved colour separation, the change of uniforms has created new overlap. The shiny bright blue uniforms of the Nao has created a significant overlap of colour values with the blue goal. Similarly, the shiny red uniforms become less saturated with the reflection of light and the hue values shift closer to orange.
+
+Soft colour is also applied to less saturated shades of colour. These shades are more likely to occur in background noise. Soft colour is used to classify additional bright and dark shades of red, orange, yellow and blue. 
+ 
+Blobs are formed for each colour class, including soft colours. Once the image is processed soft colour decisions are made based on blob arrangement in Soft Colour Filtering. 
+
+\subsection{Blob Formation}
+
+Grouping of classified colours is used for the transfer of information from an image to object recognition. When forming blobs the colour, size and area information is required. Blobs are formed based on classified colour of the classified image. Undefined, white and field green and the soft colour shadow-black are not included in blob formation. This is due to the fact that size and shape information is not required for objects of these colours. It is also due to the nature of distribution of these colours. They are all abundantly spread throughout images and scattered; forming blobs on images would involve unnecessary processing. 
+
+Blob formation checks every pixel of the image when forming blobs, this means we can form blobs as small as 1x1, however, we only use blobs greater than or equal to 3x3 pixels. In the Aibo camera this method allowed us to see the ball the entire length of the field, however, with the elevated position of the Nao camera we can only see a ball about 3/4 of the field away.
+
+\subsection{Sort Colour Blobs}
+
+Soft colour blobs are filtered and kept if of sufficient size or overlapping with the corresponding true colour. 
+
+\subsection{Combine Soft Blobs}
+
+Overlapping soft colour blobs are merged. Colour blob clusters are then made to prepare information for object recognition. Cluster variables include: exists, correct pixels, colour 2 correct pixels, min x, max x, miny, max y, height, width, area. 
+Yellow blobs, shadow yellow blobs and all yellow blobs are clustered for yellow goal recognition. Blue blobs, shadow blue blobs and all blue blobs are clustered for blue goal recognition and blue robot separation. Red blobs and shadow red blobs are clusterd for red robot detection.
+
+Clustering allows object recognition to have a region of interest. With the use of soft colour and the new goal size and shape most goal images are made of multiple blobs.
