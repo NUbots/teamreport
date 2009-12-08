@@ -1,11 +1,9 @@
-# .gitignore for TeamReport
+# .gitignore for teamreport
 
-# Remove generated files
+*.pdf
 *.aux
-*.bbl
-*.blg
 *.log
 *.out
-*.pdf
 *.toc
-*.aux
+*.bbl
+*.blg
