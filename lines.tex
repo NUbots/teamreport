@@ -65,7 +65,7 @@ $distance=\alpha*\sqrt{V_{3}[0]^2+V_{3}[1]^2}$
 $bearing=arctan2(V_{3}[0],V_{3}[1])$\\
 
 This inter system approach to the corner identification is shown in Figure \ref{fig:corner} b and c. Green components demonstrate an improvement to this approach where one of the Localisation reset triggers becomes an external one based on an added component that monitors for robot relocation by hand by way of accelerometer readings (Teleport Detection if image is BW). In the Robocup competition robots do get picked up and moved, possibly to the other side of the field and turned around by 180 degrees when being penalized. The loop created between the Line Detection and Localisation could slow down the reset as it would take some time for the bad data to be dumped after locating a goal post and dealing with conflicting information. A specialised system component could ensure this does not happen.
-\begin{figure}[!ht]
+\begin{figure}[htpb]
 \begin{center}
     %\leavevmode
     \scalebox{0.3} {\includegraphics{alexfigs/corner.png} }
