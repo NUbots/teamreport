@@ -7,3 +7,6 @@
 *.toc
 *.bbl
 *.blg
+*.db
+*.dvi
+*.ps
