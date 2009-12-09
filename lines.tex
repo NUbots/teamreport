@@ -44,7 +44,7 @@ Unique identification rules were written for each corner for a selection of poss
       
 The simulation testing also showed great improvement in Localisation over simply relying upon goal detection alone. Once a goal had been seen and Localisation determined to some approximate area, the line detection would report a unique corner point and fix a very accurate position and orientation and maintain it while looking all around the field. 
 
-The identified point on the field is then sent to Localization after performing the following transformation.\\
+The identified point on the field is then sent to Localization after performing the following transformation.
 
 $V_{cam}=[focLength, (IMG_{width}/2)- X_{img},(IMG_{height}/2)-{Y_{img}}]$
 
@@ -62,7 +62,7 @@ $\alpha=-Chest Height/V_{3}[2]$
 
 $distance=\alpha*\sqrt{V_{3}[0]^2+V_{3}[1]^2}$
 
-$bearing=arctan2(V_{3}[0],V_{3}[1])$\\
+$bearing=arctan2(V_{3}[0],V_{3}[1])$
 
 This inter system approach to the corner identification is shown in Figure \ref{fig:corner} b and c. Green components demonstrate an improvement to this approach where one of the Localisation reset triggers becomes an external one based on an added component that monitors for robot relocation by hand by way of accelerometer readings (Teleport Detection if image is BW). In the Robocup competition robots do get picked up and moved, possibly to the other side of the field and turned around by 180 degrees when being penalized. The loop created between the Line Detection and Localisation could slow down the reset as it would take some time for the bad data to be dumped after locating a goal post and dealing with conflicting information. A specialised system component could ensure this does not happen.
 \begin{figure}[htpb]
