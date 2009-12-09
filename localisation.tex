@@ -2,6 +2,24 @@
 \label{sec:Localisation}
 The localisation for 2009 was based on the Unscented Kalman Filter (UKF) used in 2008 \cite{NUManoids2008}. A number of extensions were made to improve upon the previous years implementation. Changes were made to include newly available information due to advances in vision, as well as to make use of ambiguous data that was previously available but not used.
 
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+state & units & Description \\ \hline
+x & cm & Robot’s own x-coordinate \\ \hline
+
+y & cm & Robot’s own y-coordinate\\ \hline
+$\theta$  & radians & Robot’s orientation\\ \hline
+xb & cm & Ball x-coordinate\\ \hline
+yb & cm & Ball y-coordinate\\ \hline
+vxb & cm/sec & Ball x velocity\\ \hline
+yb & cm/sec & Ball x-coordinate\\ \hline
+\end{tabular}
+\caption{States estimated by the Unscented Kalman Filter}
+\label{states}
+\end{table}
+
 \subsection{Multiple Models}
 The current robocup field contains many ambiguous points of reference as can be seen in \autoref{fig:LocalisationPoints}. When multiple ambiguous points are found it is possible to use a simple decision tree to determine which objects these are, however there are often times not enough objects are seen or the decision is still unclear. The World Model was therefore extended to incorperate multiple UKF models to allow for the use of ambiguous measurements.
 
@@ -9,7 +27,7 @@ The basic idea is that when an ambiguous object is seen e.g. a yellow goal post,
 
 As these updates are done an \emph{alpha} variable is modified depending on how well the update fits the previous model. The larger the discrepancy the more the \emph{alpha} value is reduced. Therefore the model with the largest \emph{alpha} value following the update can be deemed to have been updated with the most likely option and therefore will be the most correct model. This process can be repeated for multiple ambiguous options and therefore the results of all possible combinations can be found.
 
-If this process were repeated again and again, we would end up with an exponentially growing collection of UKF models. Therefore it is also necessary to merge these models, combining two models into one. Merging is done so that information is not lost. Models are merged based on the following metric !REFERENCE!.
+If this process were repeated again and again, we would end up with an exponentially growing collection of UKF models filling up memory and taking up processing time. Therefore it is also necessary to merge these models, combining two models into one. Merging is done so that information is not lost. Models are merged based on the following metric REFERENCE.
 
 \begin{figure}[htpb]
 \begin{center}
@@ -19,6 +37,13 @@ If this process were repeated again and again, we would end up with an exponenti
     \label{fig:LocalisationPoints}
 \end{center}
 \end{figure}
+
+\subsection{Outlier Detection}
+Outliers are updates that have been deemed to be too far removed from the current model given its current state and estimated error region. Outliers are used to reduce the impact of the false positive object recognition case, and are used to detect the kidnapped robot scenario.
+
+When an update is detected as an outlier the update is not performed on the model, this stops the outlier from ruining an otherwise accurate model. An outlier counter for this update type is then incremented to indicate that an outlier has been detected. This counter decays over time and is use to detect the kidnapped robot scenario. Once the combined outlier counter of all update types exceeds a tunable average value of outliers per second threshold, the kidnapped robot scenario is triggered.
+
+Once a kidnapped robot state has been detected a local reset is done on both x,y positional state and the heading state. During the reset the variance of the robots position in terms of each of this state is greatly increase, therefore allowing new incoming updates to greatly modify this current model and not be detected as an outlier.
 
 \subsection{Additional Objects}
 Some new objects were available as inputs for localisation this year that were not available in previous years. These included the centre circle and the penalty spots. These newly available landmarks saw huge improvements in positioning when in the mid-field area as there was previously a distinct lack of landmarks once you moved away from the goal areas. The middle of the center circle provides one of the few unique landmarks available. While the penalty spots can represent one of two locations and therefore can make use of multiple models if simple hueristics prove fruitless.
