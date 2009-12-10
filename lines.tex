@@ -114,7 +114,7 @@ The first step is removing points that do not belong on the centre circle, this 
 \begin{itemize}
 \item Find the longest line (most likely to be the centre line) and remove it from the search list.
 \item Find the Penalty Spot lines and remove it from the search list.
-\item Assuming that the lines are small, we select all the small lines. For our system, a small line is a line that is less the image width.
+\item Assuming that the lines are small, we select all the small lines. For our system, a small line is a line that is less then half the image width.
 \item We then select the line points that exist within these lines and store them in a vector ready to be processed by the next stage.
 \end{itemize}
 
