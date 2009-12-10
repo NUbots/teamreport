@@ -114,8 +114,42 @@ The first step is removing points that do not belong on the centre circle, this 
 \begin{itemize}
 \item Find the longest line (most likely to be the centre line) and remove it from the search list.
 \item Find the Penalty Spot lines and remove it from the search list.
-\item Assuming that the lines are small, we select all the small lines. For our system, a small line is a line that is less the image width.
+\item Assuming that the lines are small, we select all the small lines. For our system, a small line is a line that is less then half the image width.
 \item We then select the line points that exist within these lines and store them in a vector ready to be processed by the next stage.
 \end{itemize}
 
-The next stage consists of fitting the obtained points to an ellipse equation. By fitting the points to an equation we are able to generalise and efficiently store the data of the ellipse for later use. The ellipse fitting algorithm is an implementation of 
+The next stage consists of fitting the obtained points to an ellipse equation. By fitting the points to an equation we are able to generalise and efficiently store the data of the ellipse for later use. The ellipse fitting algorithm is an C++ implementation of the Matlab version by Halif and Flusser. A summary and Matlab version of the algorithm is as follows in \autoref{fig:MatlabEllipseFitting} \cite{Halif98}.
+
+\begin{figure}[htpb]
+	\begin{center}
+		{\scriptsize\begin{verbatim}
+			1 function a = fit_ellipse(x, y)
+			2 D1 = [x .ˆ 2, x .* y, y .ˆ 2]; % quadratic part of the design matrix
+			3 D2 = [x, y, ones(size(x))]; % linear part of the design matrix
+			4 S1 = D1’ * D1; % quadratic part of the scatter matrix
+			5 S2 = D1’ * D2; % combined part of the scatter matrix
+			6 S3 = D2’ * D2; % linear part of the scatter matrix
+			7 T = - inv(S3) * S2’; % for getting a2 from a1
+			8 M = S1 + S2 * T; % reduced scatter matrix
+			9 M = [M(3, :) ./ 2; - M(2, :); M(1, :) ./ 2]; % premultiply by inv(C1)
+			10 [evec, eval] = eig(M); % solve eigensystem
+			11 cond = 4 * evec(1, :) .* evec(3, :) - evec(2, :) .ˆ 2; % evaluate a’Ca
+			12 a1 = evec(:, find(cond > 0)); % eigenvector for min. pos. eigenvalue
+			13 a = [a1; T * a1]; % ellipse coefficients
+		\end{verbatim}}
+		\caption{MatLab Code for Fitting points to an equation of an ellipse}
+		\label{fig:MatlabEllipseFitting}
+	\end{center}
+\end{figure}
+For the transition from Matlab to C++ a new library that enabled linear algebra calculations were included into the NUbot system. This linear algebra library was called 'JAMA' an adaptation for C++ of the Java Matrix Library available freely from \cite{JAMA}.
+
+This was an efficient method of obtaining an equation of an ellipse with a small number of points, which we have filtered out to be ellipse points. 
+
+\begin{figure}[htpb]
+\begin{center}
+    %\leavevmode
+    \scalebox{1} {\includegraphics{aaronfigs/CentreCircleDetection.png} }
+    \caption{The figure is taken from the debugging application EOTN mentioned earlier. Original Image: This is an image capture from the NAO robot. Classified Image: This image is an overlay of the horizon line, detected lines and classified image. Blobs: This displays the blobs and detected lines and corner points that are currently in the image. Field objects: shows the field objects detected in the image, here we see the result of fitting the points to an ellipse equation.}
+    \label{fig:ellipse}
+\end{center}
+\end{figure}
