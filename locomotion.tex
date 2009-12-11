@@ -10,7 +10,7 @@ The source code for the walk engine is available as a standalone module at \href
 
 Aldebaran's ALMotion was used to generate walk primitives in the following directions; forward, arc, turn, backward and sideward. The arc primitive contains steps on arcs of radii from 5cm to 100cm in 5cm increments, and the turn primitive contains steps on turns of angle from 9 degrees to 180 degrees in 9 degree increments. The forward, backward and sideward only contain a single set of steps, in particular, only steps of a single length are possible while walking forwards or backwards, making lining up kicks difficult.
 
-A walk primitive contains a set of steps. A set of steps includes steps for both left and right legs, and a start step, a second step, a normal step, and a stop step. If the walk primitive contains many directions, that is, a arc or turn walk primitive, there is a set of steps for each direction. Consequently, there are over 800 individual cached steps used by the walk engine, and they are organised as shown in Figure \ref{fig:LocomotionSteps}.
+A walk primitive contains a set of steps. A set of steps includes steps for both left and right legs, and a start step, a second step, a normal step, and a stop step. If the walk primitive contains many directions, that is, an arc or turn walk primitive, there is a set of steps for each direction. Consequently, there are over 800 individual cached steps used by the walk engine, and they are organised as shown in \autoref{fig:LocomotionSteps}.
 
 \begin{figure}[tbh]
 	\begin{center}
@@ -20,7 +20,7 @@ A walk primitive contains a set of steps. A set of steps includes steps for both
 	\end{center}
 \end{figure}
 
-Each walk primitive has its own set of slightly different walk parameters, and in the case of arcs, a slightly different set of parameters was given based on the arc radius. The walk parameters are shown in Figure \ref{fig:LocomotionWalkParameters}.
+Each walk primitive has its own set of slightly different walk parameters, and in the case of arcs, a slightly different set of parameters was given based on the arc radius. The walk parameters are shown in \autoref{fig:LocomotionWalkParameters}.
 
 \begin{figure}
 	\begin{center}
@@ -73,7 +73,7 @@ Each walk primitive has its own set of slightly different walk parameters, and i
 	\end{center}
 \end{figure}
 
-As with last year's walk engine \cite{JasonsAcraPaper} different joint stiffnesses were given to each joint, the stiffnesses were slightly updated for the new V3 NAO. The stiffnesses for every joint, except the two head joints, for each primitive are shown in Figure \ref{fig:LocomotionWalkParameters2}.
+As with last year's walk engine \cite{JasonsAcraPaper} different joint stiffnesses were given to each joint, the stiffnesses were slightly updated for the new V3 NAO. The stiffnesses for every joint, except the two head joints, for each primitive are shown in \autoref{fig:LocomotionWalkParameters2}.
 
 \begin{figure}
 	\begin{center}
@@ -107,7 +107,7 @@ A change in direction is essentially a transition from one walk primitive's link
 
 In order to maximise the utility of the walk engine given the limited number of available primitives a simple time-based heuristic path planning algorithm was implemented. Prior to the selection of every step the time taken by between 4 and 6 different candidate paths to reach the target position and orientation is calculated. The path with the shortest time is selected, and the next step is chosen to implement that path as closely as possible given the current pose of the robot.
 
-The candidate paths consist of straight, arc, sideward, and turn segments.  In particular, for path planning with a final orientation, the candidate paths are arc-straight-arc, turn-straight-turn, turn-backward-turn and turn-sideward-turn, where the initial and final turn and arc segments may not be required. Figure \ref{fig:LocomotionPathPlanning} shows examples of the planned paths. Additionally, paths could be planned ignoring the final orientation.
+The candidate paths consist of straight, arc, sideward, and turn segments.  In particular, for path planning with a final orientation, the candidate paths are arc-straight-arc, turn-straight-turn, turn-backward-turn and turn-sideward-turn, where the initial and final turn and arc segments may not be required. \autoref{fig:LocomotionPathPlanning} shows examples of the planned paths. Additionally, paths could be planned ignoring the final orientation.
 
 \begin{figure}[tbh]
 	\begin{center}
