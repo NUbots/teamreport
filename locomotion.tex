@@ -1,8 +1,8 @@
 \section{Locomotion}
 
-The walk used at RoboCup 2009 was a modified version of Aldebaran's walk that implemented pseudo omni-directional capabilities. Essentially, ALMotion was used to generate a set of predefined steps offline, the cached steps are then linked together online. This allowed the robot to walk on an arc of varying radius without stopping, and a \texttt{walkToPoint} interface was used to continuously specify the desired target after each behaviour iteration. However, in some instances the robot still needs to stop when changing directions, for example, to change from a forward walk to a sideways walk first requires the robot to stop.
+The walk used at RoboCup 2009 was a modified version of Aldebaran's walk that implemented pseudo omni-directional capabilities. Essentially, ALMotion was used to generate a set of predefined steps offline, the cached steps are then linked together online by our walk engine. This allowed the robot to walk on an arc of varying radius without stopping, and in some cases link turning steps with arc or straight steps. However, in some instances the robot still needs to stop when changing directions, for example, to change from a forward walk to a sideward walk first requires the robot to stop.
 
-A heuristic path planning algorithm was implemented to determine a fast way to get to a target point given the limited number of available steps. Paths consisting of permutations, with repetition, of the set of walk primitives (forward, arc, turn, backward and sideward) are trialled, the fastest permutation that goes through the desired target with the desired orientation is chosen. This process is repeated every time a new step is required, and the step which best implements the chosen path become the next step.
+The walk engine is controlled via a \texttt{walkToPoint} interface to continuously specify a target position. A heuristic path planning algorithm was implemented to determine a fast way to get to the target point given the limited number of available steps. Paths consisting of permutations, with repetition, of the set of walk primitives (forward, arc, turn, backward and sideward) are trialled, the fastest permutation that goes through the desired target with the desired orientation is chosen. This process is repeated every time a new step is required, and the step which best implements the chosen path become the next step.
 
 The source code for the walk engine is available as a standalone module at \href{http://github.com/soneoed/naowalkoptimiser}{http://github.com/soneoed/naowalkoptimiser}. The source release includes many things; the code to generate and cache the steps, the code for the walk engine itself, the scripted motion files for kicks, getups and saves, the fall-preservation control, and code used to optimise the joint stiffnesses as a function of gait cycle (along with the associated laser scanner robot tracking).
 
@@ -68,7 +68,7 @@ Each walk primitive has its own set of slightly different walk parameters, and i
 		   setWalkGaitPeriod(20);
 		   setWalkArmParameters(90*TO_RAD, 15*TO_RAD, 20*TO_RAD, 10*TO_RAD);
 		\end{verbatim}}
-		\caption{The organisation of cached steps used by the walk engine.}
+		\caption{The walk parameter's for Aldebaran's ALMotion walk used to generate the cached steps.}
 		\label{fig:LocomotionWalkParameters}
 	\end{center}
 \end{figure}
@@ -91,7 +91,7 @@ As with last year's walk engine \cite{JasonsAcraPaper} different joint stiffness
 
 \subsection{Step Linking}
 
-The linking of steps to form a walk is simplified by having each walk primitive store each set of steps in a linked list. Basically the linked list is set up so that each step knows which step would follow if no direction change is required, and which step is required to bring the robot to rest. The rat's nest is shown in Figure \ref{LocomotionLinkedSteps}.
+The linking of steps to form a walk is simplified by having each walk primitive store each set of steps in a linked list. Basically the linked list is set up so that each step knows which step would follow if no direction change is required, and which step is required to bring the robot to rest. The linked list representation of a walk primitive is shown in Figure \ref{LocomotionLinkedSteps}.
 
 \begin{figure}[tbh]
 	\begin{center}
@@ -112,7 +112,7 @@ The candidate paths consist of straight, arc, sideward, and turn segments.  In p
 \begin{figure}[tbh]
 	\begin{center}
 		\includegraphics[width=0.8\textwidth]{locomotionfigs/pathplanning.png}
-		\caption{A selection of planned paths for different target locations and orientations. The orientation and position of the simulated robot is shown with the coloured arrows for each path. The target location and orientation is shown with a black arrow.}
+		\caption{A selection of planned paths for different target locations and orientations. The target location and orientation is shown for each path with a black arrow. The orientation and position of the simulated robot is shown with the coloured arrows for each path. Note that if the target locations were balls, the calculated paths avoid the ball.}
 		\label{fig:LocomotionPathPlanning}
 	\end{center}
 \end{figure}
