@@ -2,11 +2,15 @@
 
 
 \subsection{Image Quality and Camera Settings}
-One good thing about the transition from the Aibo to the Nao was the improvement in camera quality. While the camera still had its share of problems, such as random swaps of U and V channels, random blackouts and random ghost camera settings, at least it made the separation of colours easier.
+%One good thing about the transition from the Aibo to the Nao was the improvement in camera quality. While the camera still had its share of problems, such as random swaps of U and V channels, random blackouts and random ghost camera settings, at least it made the separation of colours easier.
+%The Nao has three different resolutions for which we could obtain images, 160x120, 320x240 and its native resolution 640x480. 
+This year was the first year where we successfully to a larger image. We increased the image from 160x120 pixels to double the resolution, 320x240 pixels. This enabled clearer images, and more accurate distances when we found recognisable objects. For example a ball could be detected by the goal keeper standing at its goal from the other end of the field. However, with higher resolution images the calculations to process an image become computationally heavy. This forced us to reduce our frame rate to 15 frames per second.
+
+There was an additional camera installed around the nose of the Nao. This camera was particularly useful for lining up kicks. However, switching over from one to another would take time, which equates to the loose of a few frames. Logic was inserted in the search behaviour to reduce the number of camera transitions. 
 
 \subsubsection{Camera settings}
 
-The Aibo camera has three camera settings and three values for each setting. The Nao camera has 6 main camera settings with a large range of values for each setting. This means that the camera settings are very sensitive to lighting changes and not only do colour tables need to be recalibrated for any change, but also the camera settings. At the RoboCup venue the camera settings and colour tables had to be recalibrated for both the main field and test field. 
+The Nao camera has 6 main camera settings with a large range of values for each setting. This means that the camera settings are very sensitive to lighting changes and not only do colour tables need to be recalibrated for any change, but also the camera settings. At the RoboCup venue the camera settings and colour tables had to be recalibrated for both the main field and test fields. 
 
 The robot is mobile with a movable head. This means that images are subject to blurring and lighting flare. Camera settings are chosen to minimise blurring and allow for best colour separation.
 
@@ -20,9 +24,7 @@ Soft colour classification is used to classify regions of colour that belong to 
 
 Using soft colour allows for the classification of `noisy' shades of colour and allows valuable object size information to be kept. The risk of false positives is reduced by allowing true colour to be classed as the shades of colour that are highly saturated. Object decisions are based on the presence of true colour and then soft colour can be used for additional size information.
 
-There are significant differences in the application of soft colour between the Aibo and Nao camera. The Aibo camera was low to the ground. This meant that objects were subject to heavy shadowing when upclose to an object. It also meant that when the ball was close to the robot it could fill the entire image. The camera quality was significantly worse than the Nao robot and there was significant overlap between objects of close hues. Soft colour was applied to separate the red uniform and orange ball, the orange ball and yellow goal, the blue goal from the navy blue uniform and the blue goal from the green field. 
-
-While the heightened stance and improved camera quality of the Nao has improved colour separation, the change of uniforms has created new overlap. The shiny bright blue uniforms of the Nao has created a significant overlap of colour values with the blue goal. Similarly, the shiny red uniforms become less saturated with the reflection of light and the hue values shift closer to orange.
+The shiny bright blue uniforms of the Nao has created a significant overlap of colour values with the blue goal. Similarly, the shiny red uniforms become less saturated with the reflection of light and the hue values shift closer to orange.
 
 Soft colour is also applied to less saturated shades of colour. These shades are more likely to occur in background noise. Soft colour is used to classify additional bright and dark shades of red, orange, yellow and blue. 
  
@@ -32,7 +34,7 @@ Blobs are formed for each colour class, including soft colours. Once the image i
 
 Grouping of classified colours is used for the transfer of information from an image to object recognition. When forming blobs the colour, size and area information is required. Blobs are formed based on classified colour of the classified image. Undefined, white and field green and the soft colour shadow-black are not included in blob formation. This is due to the fact that size and shape information is not required for objects of these colours. It is also due to the nature of distribution of these colours. They are all abundantly spread throughout images and scattered; forming blobs on images would involve unnecessary processing. 
 
-Blob formation checks every pixel of the image when forming blobs, this means we can form blobs as small as 1x1, however, we only use blobs greater than or equal to 3x3 pixels. In the Aibo camera this method allowed us to see the ball the entire length of the field, however, with the elevated position of the Nao camera we can only see a ball about 3/4 of the field away.
+Blob formation checks every pixel of the image when forming blobs, this means we can form blobs as small as 1x1, however, we only use blobs greater than or equal to 3x3 pixels. 
 
 \subsection{Sort Colour Blobs}
 

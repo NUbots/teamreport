@@ -1,16 +1,15 @@
 \section{Vision}
-The Nao vision system followed the process: \emph{Input image, classify image, form blobs, sort colour blobs, combine soft blobs, find ball, find goals, detect lines}. Even though the vision process was based on AIBO version of NUbot code the only section that could be reused was blob formation. 
+The Nao vision system followed the process: \emph{Input image, classify image, form blobs, sort colour blobs, combine soft blobs, find ball, find goals, detect lines}. The 2009 vision module was an advancement over the 2008 module. This section details the main functions of the vision system and the reasons behind them. 
 
-The 2009 vision module was a slight advancement over the 2008 module. This section details the main functions of the vision system and the reasons behind them. 
 \subsection{Overview}
 
-Webots was used to develop the base vision system. Inputting the RGB image and classifying it using a perfect look-up table (LUT) allowed blob formation and basic object recognition to be tested which then allowed for localisation development to begin.
+Webots was used to develop the base vision system in 2008. Inputting the RGB image and classifying it using a perfect look-up table (LUT) allowed blob formation and basic object recognition to be tested which then allowed for localisation development to begin. 
 
-We then worked on developing the vision debug application \emph{Eye of the NUbot} (EOTN). What made this application different is the HSI classification method. Transforming the YUV image to HSI values and selecting the classification region in HSI allowed for an intuitive classification method and better separation of hue ranges. 
+However this was not required in 2009, as the vision debugging application \emph{Eye of the NUbot} (EOTN) was already compatible with the robot directly. Advancements of EOTN carried over from last year were the HSI classification method. Transforming the YUV image to HSI values and selecting the classification region in HSI allowed for an intuitive classification method and better separation of hue ranges. 
 
-Once we had a robot we were able to select camera settings using \emph{Telepathe} and save image streams. We could then work on object recognition.
+The process of setting up a robot for a game includes setting the camera settings were selected using \emph{Telepathe}. Then obtaining image streams which were saved on the robot or could be transferred through the wireless interface to EOTN to be processed and examined. During examination of the images, the user could also generate a LUT using EOTN. Generating the LUT also enabled the user to check the classification and field object detection for errors. Before uploading the new LUT to the robot to use. This had to be completed for both top and bottom cameras.
 
-Advancements that were included in the vision module this year were more ratio checks for the ball and goals, including a green horizon. This was to reduce the number of false objects recognised by the robots. We also included heuristics for the detection of new field objects, such as penalty spots, and the centre circle. These new field objects greatly enhanced the performance of the localisation module. Also, we increased the camera resolution from the minimal of 160x120 to an medium image of 320x240. This increased the accuracy of the object seen (example, a ball can be seen at the full length of the field), with a trade-off to robots processing speed.
+Advancements that were included in the vision module this year were more ratio checks for the ball and goals, including a green horizon. This was to reduce the number of false objects recognised by the robots. We also included heuristics for the detection of new field objects, such as penalty spots, and the centre circle. These new field objects greatly enhanced the performance of the localisation module. Also, we increased the camera resolution from the minimal of 160x120 to an medium image of 320x240. This increased the accuracy of the object seen (example, a ball can be seen at the full length of the field), with a trade-off to robots processing speed. Also there was an additional camera added into the hardware system, in which we had to account for when processing the image.
 
 \input{classandblobs.tex}
 \input{objects.tex}
