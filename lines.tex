@@ -1,9 +1,9 @@
 \subsection{Line and Corner Point Detection}
 
-This year the algorithm used in previous years to detect field lines and corners \cite{NUBOT2006,NUManoids2008} was built upon. The detection algorithm is almost the same as the previous years, other then few modifications required to scan the larger image. Further development this year involved improvements to the corner selection, penalty spot detection and centre circle detection for use in Localization. Calibration of the cameras were also included to improve the estimation of distances. 
+This year the algorithm used in previous years to detect field lines and corners \cite{NUBOT2006,NUManoids2008} was built upon. The detection algorithm is almost the same as the previous years, other then few modifications required to scan the larger image. Further development this year involved improvements to the corner selection, penalty spot detection and centre circle detection for use in Localization. Calibration of the cameras was also included to improve the estimation of distances. 
 
 \subsubsection{Line Detection}
-The detection of field lines is approached in a completely different manner to that of other Objects. When searching for objects, sections of a specific colour are joined together to form a blob. While this works well for most objects, white causes problems due to its abundance in the image and hence is normally ignored. Also the thin nature of lines, and the robot's low Point Of View, makes missing pixels very common within the classified image. Finally the storing of blobs, as a square which bounds the entire object, does not store enough important information about the line.
+The detection of field lines is approached in a completely different manner to that of other objects. When searching for objects, sections of a specific colour are joined together to form a blob. While this works well for most objects, white causes problems due to its abundance in the image and hence is normally ignored. Also the thin nature of lines, and the robot's low point of view, makes missing pixels very common within the classified image. Finally the storing of blobs, as a square which bounds the entire object, does not store enough important information about the line.
 
 To overcome these issues the detection of lines is based around the two unique features that field lines have; their long thin length and their green-white-green transitions. Using these two details the image can be sparsely searched, since the search line does not need to find every point of the line, just enough to re-create the line. Also the transition information allows many white pixels to be thrown out early in the detection process, thereby reducing the overall load on the processor. This reliance on points and not the entire line also allows the lines to be partially hidden behind another object without effecting their detection. 
 
@@ -11,7 +11,7 @@ With these factors in mind, the image can now be efficiently searched in the fol
 
 \begin{itemize}
 
-\item 	The image is searched using a horizontal and vertical search grid. The search is restricted to the area in the image below the horizon line and picks out points of sharp contrast which have green-white then white-green transitions. These points are recorded in an array for later use.
+\item The image is searched using a horizontal and vertical search grid. The search is restricted to the area in the image below the horizon line and picks out points of sharp contrast which have green-white then white-green transitions. These points are recorded in an array for later use.
 
 \item The found points are then checked against each other to form possible lines. Once candidates are found, more points are checked and added until a line is formed. All checks on the lines at this stage is done based on gradient to allow the fastest line formation.
 
@@ -32,9 +32,9 @@ The goal was not to provide data that Localization can rely upon solely but to f
       
 The identification relies upon the orientation of the seen corners, the combination of these corners and other lines in the image and the number of corners and lines seen. The Line Detection algorithm classifies each corner as either a type L or T and then attributes it with one of four possible orientations, pointing up/down or pointing left/right. By disassembling the field lines in the image they could be examined for what types of corners and orientations make up what is seen. Following that, this information is then decoded to match what should be seen from the present known location. Avoiding false positives here partially takes care of itself as if the robot location or orientation data is wrong, the corresponding corner orientation classification will not match the rule.
 
-For example, in \autoref{fig:corner} a taken from the simulator, the detection algorithm reports seeing 3 corners: 2 type L's of orientation 2 and 4, 1 type T of orientation 1 and 4 lines. This set of data is almost unique when compared to the other countless possible positions and perspectives from which to view the field lines and can therefore be decoded with brute force. 
+For example, in \autoref{fig:corner} as taken from the simulator, the detection algorithm reports seeing 3 corners: 2 type L's of orientation 2 and 4, 1 type T of orientation 1 and 4 lines. This set of data is almost unique when compared to the other countless possible positions and perspectives from which to view the field lines and can therefore be decoded with brute force. 
  
-The only other occurrence is a duplicate on the opposite end of the field as both halves are identical. This the leaves the question, 'which end of the field is the robot in?'. Knowledge of the robots orientation could also solve this problem of determining which end of the field this scene is taken from. To be robust, the rules written require Localization to be certain of both field XY position and orientations to 2 standard deviations. This value could be increased in this case but for others closer to the mid field line, the probability of error increases as the two mirror images from each end come closer together. The necessity for this prior knowledge is best show pictorially.
+The only other occurrence is a duplicate on the opposite end of the field as both halves are identical. This the leaves the question, `which end of the field is the robot in?'. Knowledge of the robots orientation could also solve this problem of determining which end of the field this scene is taken from. To be robust, the rules written require Localization to be certain of both field XY position and orientations to 2 standard deviations. This value could be increased in this case but for others closer to the mid field line, the probability of error increases as the two mirror images from each end come closer together. The necessity for this prior knowledge is best show pictorially.
     
 In the first frame we have no other information to work with other than the lines themselves. In the second frame, the Goal Detection provides Localisation with enough information to determine which end of the field the robot is in and it is now possible to uniquely identify the corner points.
       
@@ -97,28 +97,28 @@ This inter system approach to the corner identification is shown in Figure \ref{
 
 
 \subsubsection{Penalty Spot Detection}
-Penalty spots exists in two positions on the field. By detecting any penalty spot, localisation module has a higher chance of knowing where the robot is currently situated on the field. Detecting the penalty spot consists of a search heuristic:
+Penalty spots exist in two positions on the field. By detecting any penalty spot, localisation module has a higher chance of knowing where the robot is currently situated on the field. Detecting the penalty spot consists of a search heuristic:
 \begin{itemize}
 \item Find lines that are less then a quarter length of the screen: If a standing robot should see a penalty spot, it should be relatively small on the screen.
 \item Using the points on the selected line, we scan around each of these line points for surrounding white colours:
 This scan consists of a 3x3 grid search around the selected point.
-\item If there does not exist to be any white colours, its most likely to be a penalty spot, Otherwise it is not a penalty spot.
+\item If there does not exist to be any white colours, its most likely to be a penalty spot, otherwise it is not a penalty spot.
 \end{itemize}
 This is a simple and efficient heuristic, because the priori conditions make the search space is very small.
 
 \subsubsection{Centre Circle Detection}
-Centre circle is an a very important field object on the SPL field. This object is so big that almost from any section of the field (provided that is facing inwards). It enhances and assists the localisation module greatly, due to its visibility and unambiguous properties of the object. To detect a centre circle, there exists two steps. First Step, is to remove points that do not belong on the centre circle. Second step, consists of an least squares approach to fit the points of the centre circle to an ellipse equation.
+Centre circle is an a very important field object on the SPL field. This object is so big that it can be seen almost from any section of the field (provided that is facing inwards). It enhances and assists the localisation module greatly, due to its visibility and unambiguous properties. To detect a centre circle, there exists two steps. First Step, is to remove points that do not belong on the centre circle. Second step consists of a least squares approach to fit the points of the centre circle to an ellipse equation.
 Once this is complete, we are able to obtain the ellipse, and the robots current distance to it.
 
-The first step is removing points that do not belong on the centre circle, this is achieved by an heuristic. Here we assume that after all points have been fitted to a line, corners (intersections) of lines have been calculated and all penalty spots have already been detected. Here we assume a centre circle consists of many small straight lines, with many straight lines these should intersect on screen a large number of times. Assuming a number of corner tolerance of six, if the number of corners are greater then six, centre circle detection will be triggered. 
+The first step is removing points that do not belong on the centre circle, this is achieved by a heuristic. Here we assume that after all points have been fitted to a line, corners (intersections) of lines have been calculated and all penalty spots have already been detected. Here we assume a centre circle consists of many small straight lines, with many straight lines these should intersect on screen a large number of times. Assuming a number of corner tolerance of six, if the number of corners are greater then six, centre circle detection will be triggered. 
 \begin{itemize}
 \item Find the longest line (most likely to be the centre line) and remove it from the search list.
-\item Find the Penalty Spot lines and remove it from the search list.
-\item Assuming that the lines are small, we select all the small lines. For our system, a small line is a line that is less then half the image width.
+\item Remove any detected penalty spots from the search list.
+\item Assuming that the relevant lines are small, we select all the small lines. For our system, a small line is a line that is less then half the image width.
 \item We then select the line points that exist within these lines and store them in a vector ready to be processed by the next stage.
 \end{itemize}
 
-The next stage consists of fitting the obtained points to an ellipse equation. By fitting the points to an equation we are able to generalise and efficiently store the data of the ellipse for later use. The ellipse fitting algorithm is an C++ implementation of the Matlab version by Halif and Flusser. A summary and Matlab version of the algorithm is as follows in \autoref{fig:MatlabEllipseFitting} \cite{Halif98}.
+The next stage consists of fitting the obtained points to an ellipse equation. By fitting the points to an equation we are able to generalise and efficiently store the data of the ellipse for later use. The ellipse fitting algorithm is a C++ implementation of the Matlab version by Halif and Flusser. A summary and Matlab version of the algorithm is shown in \autoref{fig:MatlabEllipseFitting} \cite{Halif98}.
 
 \begin{figure}[htpb]
 	\begin{center}
@@ -137,13 +137,11 @@ The next stage consists of fitting the obtained points to an ellipse equation. B
 			12 a1 = evec(:, find(cond > 0)); % eigenvector for min. pos. eigenvalue
 			13 a = [a1; T * a1]; % ellipse coefficients
 		\end{verbatim}}
-		\caption{MatLab Code for Fitting points to an equation of an ellipse}
+		\caption{MatLab Code for Fitting points to an equation of an ellipse \cite{Halif98}.}
 		\label{fig:MatlabEllipseFitting}
 	\end{center}
 \end{figure}
-For the transition from Matlab to C++ a new library that enabled linear algebra calculations were included into the NUbot system. This linear algebra library was called 'JAMA' an adaptation for C++ of the Java Matrix Library available freely from \cite{JAMA}.
-
-This was an efficient method of obtaining an equation of an ellipse with a small number of points, which we have filtered out to be ellipse points. 
+For the transition from Matlab to C++ a new library that enabled linear algebra calculations was included into the NUbot system. This linear algebra library was called 'JAMA' an adaptation for C++ of the Java Matrix Library available freely from \cite{JAMA}.
 
 \begin{figure}[htpb]
 \begin{center}

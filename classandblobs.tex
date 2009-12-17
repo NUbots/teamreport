@@ -4,7 +4,7 @@
 \subsection{Image Quality and Camera Settings}
 %One good thing about the transition from the Aibo to the Nao was the improvement in camera quality. While the camera still had its share of problems, such as random swaps of U and V channels, random blackouts and random ghost camera settings, at least it made the separation of colours easier.
 %The Nao has three different resolutions for which we could obtain images, 160x120, 320x240 and its native resolution 640x480. 
-This year was the first year where we successfully to a larger image. We increased the image from 160x120 pixels to double the resolution, 320x240 pixels. This enabled clearer images, and more accurate distances when we found recognisable objects. For example a ball could be detected by the goal keeper standing at its goal from the other end of the field. However, with higher resolution images the calculations to process an image become computationally heavy. This forced us to reduce our frame rate to 15 frames per second.
+This year was the first year where we successfully started processing larger image resolutions. We increased the image resolution from 160x120 pixels to double the resolution, 320x240 pixels. This enabled clearer images and more accurate distances when we found recognisable objects. For example a ball could be detected by the goal keeper standing at its goal from the other end of the field. However, with higher resolution images the calculations to process an image became computationally heavy. This forced us to reduce our frame rate to 15 frames per second.
 
 There was an additional camera installed around the nose of the Nao. This camera was particularly useful for lining up kicks. However, switching over from one to another would take time, which equates to the loose of a few frames. Logic was inserted in the search behaviour to reduce the number of camera transitions. 
 
@@ -16,7 +16,7 @@ The robot is mobile with a movable head. This means that images are subject to b
 
 \subsection{Colour Classification}
 
-Colour classification is the top tier in the software system. Any error in classification has a flow on effect to the entire system. Image pixels are mapped to a colour class by referencing a LUT. The environment of the Standard Platform League is colour coded so that objects are recognisable by colour. Rather than classify pixels based on object colour classes alone, additional 'soft' colour classes are used to allow additional colour information to be classified and to reduce the risk of false positive classification.
+Colour classification is the top tier in the software system. Any error in classification has a flow on effect to the entire system. Image pixels are mapped to a colour class by referencing a LUT. The environment of the Standard Platform League is colour coded so that objects are recognisable by colour. Rather than classify pixels based on object colour classes alone, additional `soft' colour classes are used to allow additional colour information to be classified and to reduce the risk of false positive classification.
 
 \subsubsection{Soft Colour Classification}
 
@@ -24,7 +24,7 @@ Soft colour classification is used to classify regions of colour that belong to 
 
 Using soft colour allows for the classification of `noisy' shades of colour and allows valuable object size information to be kept. The risk of false positives is reduced by allowing true colour to be classed as the shades of colour that are highly saturated. Object decisions are based on the presence of true colour and then soft colour can be used for additional size information.
 
-The shiny bright blue uniforms of the Nao has created a significant overlap of colour values with the blue goal. Similarly, the shiny red uniforms become less saturated with the reflection of light and the hue values shift closer to orange.
+The shiny bright blue uniforms of the Nao have created a significant overlap of colour values with the blue goal. Similarly, the shiny red uniforms become less saturated with the reflection of light and the hue values shift closer to orange.
 
 Soft colour is also applied to less saturated shades of colour. These shades are more likely to occur in background noise. Soft colour is used to classify additional bright and dark shades of red, orange, yellow and blue. 
  
@@ -42,7 +42,7 @@ Soft colour blobs are filtered and kept if of sufficient size or overlapping wit
 
 \subsection{Combine Soft Blobs}
 
-Overlapping soft colour blobs are merged. Colour blob clusters are then made to prepare information for object recognition. Cluster variables include: exists, correct pixels, colour 2 correct pixels, min x, max x, miny, maxy, height, width, area. 
+Overlapping soft colour blobs are merged. Colour blob clusters are then made to prepare information for object recognition. Cluster variables include: exists, correct pixels, colour 2 correct pixels, min x, max x, min y, max y, height, width, area. 
 Yellow blobs, shadow yellow blobs and all yellow blobs are clustered for yellow goal recognition. Blue blobs, shadow blue blobs and all blue blobs are clustered for blue goal recognition and blue robot separation. Red blobs and shadow red blobs are clustered for red robot detection.
 
 Clustering allows object recognition to have a region of interest. With the use of soft colour most goal images are made of multiple blobs.
